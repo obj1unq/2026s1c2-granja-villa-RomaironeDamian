@@ -3,14 +3,19 @@ import wollok.game.*
 class Trigo {
 	var property position
 	var property image = "wheat_0.png"
-	var property ciclo = 0
-	method regar() {
-	  if (ciclo == 3) {
-	  	ciclo = 0
+	var property etapa = 0
+
+	method precio() {
+		return (etapa - 1) * 100
+	}
+
+	method crecer() {
+	  if (etapa == 3) {
+	  	etapa = 0
 	  } else {
-		ciclo += 1
+		etapa += 1
 	  }
-	  image = "wheat_"+ ciclo.toString() + ".png"
+	  image = "wheat_"+ etapa.toString() + ".png"
 	}
 
 	method sembrar() {
@@ -20,12 +25,24 @@ class Trigo {
 	method esCultivo() {
 	  return true
 	}
+
+	method esMercado() {
+        return false
+    }
+
+	method puedeSerCosechado() {
+	  return etapa >= 2
+	}
+
+	method serCosechado() {
+	  game.removeVisual(self)
+	}
 }
 
 class Tomaco {
 	var property position
 	var property image = "tomaco.png"
-	method regar() {
+	method crecer() {
 	  if (game.height()-1 == position.y()) {
 		position = game.at(position.x(), 0)
 	  } else {
@@ -33,11 +50,27 @@ class Tomaco {
 	  }
 	}
 
+	method precio() {
+		return 80
+	}
+
 	method sembrar() {
 	  game.addVisual(self)
 	}
 
 	method esCultivo() {
+	  return true
+	}
+
+	method esMercado() {
+        return false
+    }
+
+	method serCosechado() {
+	  game.removeVisual(self)
+	}
+
+	method puedeSerCosechado() {
 	  return true
 	}
 }
@@ -51,7 +84,7 @@ class Maiz {
 	  game.addVisual(self)
 	}
 
-	method regar() {
+	method crecer() {
 		estado = maizAdulta
 		image = estado.image()
 	}
@@ -59,12 +92,37 @@ class Maiz {
 	method esCultivo() {
 	  return true
 	}
+
+	method esMercado() {
+        return false
+    }
+
+	method serCosechado() {
+		game.removeVisual(self)
+	}
+
+	method puedeSerCosechado() {
+	  return estado.puedeSerCosechado()
+	}
+
+	method precio() {
+		return 150
+	}
+
 }
 
 object maizBebe {
   var property image = "corn_baby.png"
+
+  method puedeSerCosechado() {
+	return false
+  }
 }
 
 object maizAdulta {
   var property image = "corn_adult.png"
+
+  method puedeSerCosechado() {
+	return true
+  }
 }

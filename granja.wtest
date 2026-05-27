@@ -1,0 +1,60 @@
+import mercado.*
+import personaje.*
+import wollok.game.*
+import cultivos.*
+
+describe "testeando funciones del personaje" {
+  method initialize() {
+  	game.clear()
+  	game.height(10)
+  	game.width(10)
+  }
+  test "validadores" {
+    personaje.sembrar(new Maiz(position = personaje.position()))
+    assert.throwsException({ personaje.sembrar(new Trigo(position = personaje.position())) })
+    assert.throwsException({ personaje.desplegarAspersor() })
+    assert.throwsException({ personaje.venderStock() })
+  }
+
+  test "Mercado" {
+    const mercado = new Mercado(position = game.center(), cantMonedas = 300)
+    game.addVisual(mercado)
+    assert.equals(300, mercado.cantMonedas())
+    personaje.saldo(100)
+    assert.equals(100, personaje.saldo())
+    personaje.agregarPlantasCosechadas([new Tomaco(position = game.at(1,1)), new Tomaco(position = game.at(1,2)), new Tomaco(position = game.at(1,3))])
+    personaje.venderStock()
+    assert.equals(340, personaje.saldo())
+    assert.equals(60, mercado.cantMonedas())
+  }
+
+  test "El trigo crece al ser regado" {
+    const trigo = new Trigo(position = game.center())
+    game.addVisual(trigo)
+    assert.equals(0, trigo.etapa())
+    personaje.regar()
+    assert.equals(1, trigo.etapa())
+    personaje.regar()
+    assert.equals(2, trigo.etapa())
+    personaje.regar()
+    assert.equals(3, trigo.etapa())
+    personaje.regar()
+    assert.equals(0, trigo.etapa())
+  }
+
+  test "El tomaco crece al ser regado" {
+    const tomaco = new Tomaco(position = game.center())
+    game.addVisual(tomaco)
+    assert.equals(game.center(), tomaco.position())
+    personaje.regar()
+    assert.equals(game.at(5,6), tomaco.position())
+  }
+
+  test "El maiz crece al ser regado" {
+    const maiz = new Maiz(position = game.center())
+    game.addVisual(maiz)
+    assert.equals(maizBebe, maiz.estado())
+    personaje.regar()
+    assert.equals(maizAdulta, maiz.estado())
+  }
+}
